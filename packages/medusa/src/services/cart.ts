@@ -1,8 +1,7 @@
 import { isEmpty, isEqual } from "lodash"
 import { MedusaError, Validator } from "medusa-core-utils"
 import { DeepPartial, EntityManager, In } from "typeorm"
-import { TransactionBaseService, IPriceSelectionStrategy } from "../interfaces"
-import SalesChannelFeatureFlag from "../loaders/feature-flags/sales-channels"
+import { IPriceSelectionStrategy, TransactionBaseService } from "../interfaces"
 import {
   Address,
   Cart,
@@ -28,13 +27,11 @@ import {
 } from "../types/cart"
 import { AddressPayload, FindConfig, TotalField } from "../types/common"
 import { buildQuery, isDefined, setMetadata, validateId } from "../utils"
-import { FlagRouter } from "../utils/flag-router"
 import CustomShippingOptionService from "./custom-shipping-option"
 import CustomerService from "./customer"
 import DiscountService from "./discount"
 import EventBusService from "./event-bus"
 import GiftCardService from "./gift-card"
-import { SalesChannelService } from "./index"
 import InventoryService from "./inventory"
 import LineItemService from "./line-item"
 import LineItemAdjustmentService from "./line-item-adjustment"
@@ -43,9 +40,12 @@ import ProductService from "./product"
 import ProductVariantService from "./product-variant"
 import RegionService from "./region"
 import ShippingOptionService from "./shipping-option"
-import StoreService from "./store"
 import TaxProviderService from "./tax-provider"
 import TotalsService from "./totals"
+import SalesChannelFeatureFlag from "../loaders/feature-flags/sales-channels"
+import { FlagRouter } from "../utils/flag-router"
+import StoreService from "./store"
+import { SalesChannelService } from "./index"
 
 type InjectedDependencies = {
   manager: EntityManager
