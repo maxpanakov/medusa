@@ -321,7 +321,7 @@ class CartService extends TransactionBaseService<CartService> {
       query.select = undefined
     }
 
-    const queryRelations = query.relations
+    const queryRelations = [...(query.relations ?? [])]
     query.relations = undefined
 
     const raw = await cartRepo.findOneWithRelations(queryRelations, query)
@@ -1507,6 +1507,7 @@ class CartService extends TransactionBaseService<CartService> {
           cartId,
           {
             select: [
+              "id",
               "total",
               "subtotal",
               "tax_total",
