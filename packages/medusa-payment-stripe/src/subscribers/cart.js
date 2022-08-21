@@ -17,24 +17,28 @@ class CartSubscriber {
 
   async onCustomerUpdated(cartId) {
     await this.manager_.transaction(async (transactionManager) => {
-      const cart = await this.cartService_.withTransaction(this.manager_).retrieve(cartId, {
-        select: [
-          "subtotal",
-          "tax_total",
-          "shipping_total",
-          "discount_total",
-          "total",
-        ],
-        relations: [
-          "items",
-          "billing_address",
-          "shipping_address",
-          "region",
-          "region.payment_providers",
-          "payment_sessions",
-          "customer",
-        ],
-      })
+      const cart = await this.cartService_
+        .withTransaction(this.manager_)
+        .retrieve(cartId, {
+          select: [
+            "subtotal",
+            "tax_total",
+            "shipping_total",
+            "discount_total",
+            "total",
+          ],
+          relations: [
+            "items",
+            "billing_address",
+            "shipping_address",
+            "region",
+            "region.payment_providers",
+            "items",
+            "items.adjustments",
+            "payment_sessions",
+            "customer",
+          ],
+        })
 
       if (!cart.payment_sessions?.length) {
         return Promise.resolve()
@@ -45,7 +49,9 @@ class CartSubscriber {
       )
 
       if (session) {
-        return this.paymentProviderService_.withTransaction(this.manager_).updateSession(session, cart)
+        return this.paymentProviderService_
+          .withTransaction(this.manager_)
+          .updateSession(session, cart)
       }
     })
   }
