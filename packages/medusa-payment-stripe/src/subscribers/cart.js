@@ -16,44 +16,42 @@ class CartSubscriber {
   }
 
   async onCustomerUpdated(cartId) {
-    await this.manager_.transaction(async (transactionManager) => {
-      const cart = await this.cartService_
-        .withTransaction(transactionManager)
-        .retrieve(cartId, {
-          select: [
-            "subtotal",
-            "tax_total",
-            "shipping_total",
-            "discount_total",
-            "total",
-          ],
-          relations: [
-            "items",
-            "billing_address",
-            "shipping_address",
-            "region",
-            "region.payment_providers",
-            "items",
-            "items.adjustments",
-            "payment_sessions",
-            "customer",
-          ],
-        })
+    const cart = await this.cartService_
+      .withTransaction(this.manager_)
+      .retrieve(cartId, {
+        select: [
+          "subtotal",
+          "tax_total",
+          "shipping_total",
+          "discount_total",
+          "total",
+        ],
+        relations: [
+          "items",
+          "billing_address",
+          "shipping_address",
+          "region",
+          "region.payment_providers",
+          "items",
+          "items.adjustments",
+          "payment_sessions",
+          "customer",
+        ],
+      })
 
-      if (!cart.payment_sessions?.length) {
-        return Promise.resolve()
-      }
+    if (!cart.payment_sessions?.length) {
+      return Promise.resolve()
+    }
 
-      const session = cart.payment_sessions.find(
-        (ps) => ps.provider_id === "stripe"
-      )
+    const session = cart.payment_sessions.find(
+      (ps) => ps.provider_id === "stripe"
+    )
 
-      if (session) {
-        return await this.paymentProviderService_
-          .withTransaction(transactionManager)
-          .updateSession(session, cart)
-      }
-    })
+    if (session) {
+      return await this.paymentProviderService_
+        .withTransaction(this.manager_)
+        .updateSession(session, cart)
+    }
   }
 }
 
